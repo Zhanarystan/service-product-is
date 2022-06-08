@@ -2,8 +2,14 @@ import axios, { AxiosError, AxiosResponse } from "axios";
 import { toast } from "react-toastify";
 import { history } from '../..';
 import { Establishment, EstablishmentCreateValues, EstablishmentWithList } from "../models/establishment";
+import { EstablishmentProduct } from "../models/establishmentProduct";
+import { Estimate, EstimateCreate } from "../models/Estimate";
+import { ManufacturerCreate, ManufacturerDetail, ManufacturerListItem } from "../models/manufacturer";
+import { MetricListItem } from "../models/metric";
 import { PaginatedResult } from "../models/pagination";
-import { User, UserAtEstablishment, UserAtEstablishmentCreate, UserFormValues } from "../models/user";
+import { ProductCreate, ProductDetail, ProductListItem } from "../models/product";
+import { ServiceCreate, ServiceDetail, ServiceListItem } from "../models/service";
+import { User, UserAtEstablishment, UserAtEstablishmentCreate, UserDetail, UserFormValues } from "../models/user";
 import { store } from "../stores/store";
 
 
@@ -93,18 +99,81 @@ const EstablishmentRequests = {
     list: () => requests.get<Establishment[]>('/establishment'),
     create: (establishment: EstablishmentCreateValues) => requests.post<boolean>('/establishment', establishment),
     get: (id: number) => requests.get<EstablishmentWithList>(`/establishment/${id}`),
+    updateProduct: (establishmentProduct: EstablishmentProduct) => 
+        requests.put<EstablishmentProduct>(`/establishment/updateProduct`, establishmentProduct),
+    uploadPhoto: <EstablishmentWithList>(establishmentId: number, file:File) => {
+        let formData = new FormData();
+        formData.append('File', file);
+        return axios.post<EstablishmentWithList>(`/establishment/uploadPhoto/${establishmentId}`, formData, {
+            headers: {'Content-type': 'multipart/form-data'}
+        });
+    },
+    updateEstablishment: (id:number, establishment: EstablishmentCreateValues) => 
+        requests.put<EstablishmentCreateValues>(`/establishment/${id}`, establishment),
 }
 
 const UserRequests = {
     usersAtCurrentEstablishment: () => requests.get<UserAtEstablishment[]>('/user/usersAtEstablishment'),
-    get: (id: string) => requests.get<UserAtEstablishment>(`/user/${id}`),
+    list: () => requests.get<UserAtEstablishment[]>('/user'),
+    get: (id: string) => requests.get<UserDetail>(`/user/${id}`),
     create: (user: UserAtEstablishmentCreate) => requests.post<UserAtEstablishment>('/user', user),
+}
+
+const EstimateRequests = {
+    createEstimate: (estimate: EstimateCreate) => requests.post<Estimate>('/estimate', estimate),
+}
+
+const ProductRequests = {
+    list: () => requests.get<ProductListItem[]>('/product'),
+    create: (product: ProductCreate) => requests.post<ProductCreate>('/product', product),
+    get: (id:string) => requests.get<ProductDetail>(`/product/${id}`),
+    update: (id: string, product: ProductDetail) => requests.put<ProductDetail>(`/product/${id}`, product),
+    delete: (id: string) => requests.del<any>(`/product/${id}`),
+    uploadCSV: (file: File) => {
+        let formData = new FormData();
+        formData.append('File', file);
+        return axios.post<ProductListItem[]>(`/product/createFromCsv`, formData, {
+            headers: {'Content-type': 'multipart/form-data'}
+        });
+    }
+}
+
+const ServiceRequests = {
+    list: () => requests.get<ServiceListItem[]>('/service'),
+    create: (service: ServiceCreate) => requests.post<ServiceCreate>('/service', service),
+    get: (id:string) => requests.get<ServiceDetail>(`/service/${id}`),
+    update: (id: string, service: ServiceDetail) => requests.put<ServiceDetail>(`/service/${id}`, service),
+    delete: (id: string) => requests.del<any>(`/service/${id}`),
+    uploadCSV: (file: File) => {
+        let formData = new FormData();
+        formData.append('File', file);
+        return axios.post<ServiceListItem[]>(`/service/createFromCsv`, formData, {
+            headers: {'Content-type': 'multipart/form-data'}
+        });
+    }
+}
+
+const MetricRequests = {
+    list: () => requests.get<MetricListItem[]>('/metric'),
+}
+
+const ManufacturerRequests = {
+    list: () => requests.get<ManufacturerListItem[]>('/manufacturer'),
+    create: (manufacturer: ManufacturerCreate) => requests.post<ManufacturerCreate>('/manufacturer', manufacturer),
+    get: (id: string) => requests.get<ManufacturerDetail>(`/manufacturer/${id}`),
+    update: (id: string, manufacturer: ManufacturerDetail) => requests.put<ManufacturerDetail>(`/manufacturer/${id}`, manufacturer),
+    delete: (id: string) => requests.del<any>(`/manufacturer/${id}`)
 }
 
 const agent = {
     EstablishmentRequests,
     Account,
-    UserRequests
+    UserRequests,
+    EstimateRequests,
+    ProductRequests,
+    ServiceRequests,
+    MetricRequests,
+    ManufacturerRequests,
 }
 
 export default agent;

@@ -21,9 +21,8 @@ function LoginPage() {
     <div className="ui middle aligned center aligned grid" id='cus-grid'>
       <div className="column">
         <h2 className="ui teal image header">
-          <img src="assets/images/logo.png" className="image" />
           <div className="content">
-            Log-in to your account
+            Вход в аккаунт
           </div>
         </h2>
         <form className="ui large form" onSubmit={submit}>
@@ -34,7 +33,7 @@ function LoginPage() {
                 <input 
                   type="text" 
                   name="email" 
-                  placeholder="E-mail address"
+                  placeholder="Имя пользователя"
                   onChange={(e) => setUsername(e.target.value)} />
               </div>
             </div>
@@ -44,7 +43,7 @@ function LoginPage() {
                 <input 
                   type="password" 
                   name="password" 
-                  placeholder="Password"
+                  placeholder="Пароль"
 
                   onChange={(e) => setPassword(e.target.value)} />
               </div>
@@ -54,9 +53,6 @@ function LoginPage() {
 
           <div className="ui error message"></div>
         </form>
-        <div className="ui message">
-          New to us? <a href="#">Sign Up</a>
-        </div>
       </div>
     </div>
   );

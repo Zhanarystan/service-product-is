@@ -31,3 +31,18 @@ export interface UserAtEstablishmentCreate {
     establishmentId: number,
     roles: string[];
 }
+
+export interface UserDetail {
+    id: string;
+    username: string;
+    email: string;
+    firstName: string;
+    secondName: string;
+    iin: string;
+    day: number;
+    month: number;
+    year: number;
+    establishmentId: number;
+    establishment: string;
+    roles: string[];
+}

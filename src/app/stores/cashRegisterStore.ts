@@ -1,28 +1,105 @@
+import { cp } from "fs";
 import { makeAutoObservable, runInAction } from "mobx";
 import { toast } from "react-toastify";
 import { Toast } from "react-toastify/dist/components";
+import Swal from "sweetalert2";
 import agent from "../api/agent";
 import { Cart } from "../models/cart";
 import { Establishment, EstablishmentWithList } from "../models/establishment";
 import { EstablishmentProduct } from "../models/establishmentProduct";
 import { EstablishmentService } from "../models/establishmentService";
+import { EstimateProductCreate, EstimateServiceCreate } from "../models/Estimate";
 import { store } from "./store";
 
 export default class CashRegisterStore {
     cashRegisterProducts: EstablishmentProduct[] = [];
     cashRegisterServices: EstablishmentService[] = [];
-    cart: Cart = {cartProducts: [], cartServices: [], sum: 0};
+    cart: Cart = {cartProducts: [] as EstablishmentProduct[], cartServices: [] as EstablishmentService[], sum: 0};
     message: string = "";
+    loading: boolean = false;
+    productsTabSelected = true;
+    showModal = false;
 
     constructor() {
         makeAutoObservable(this);
     }
+
+    setLoading = (value: boolean) => {
+        this.loading = value;
+    }
+    setProductsTabSelected = (value: boolean) => {
+        this.productsTabSelected = value;
+    }
+
+   
+    sendEstimate = async () => {
+        this.setLoading(true);
+        const cart = this.cart;
+        if(store.userStore.user === null) {
+            this.setLoading(false);
+            return;
+        }
+        try {
+            const establishment = await agent.EstablishmentRequests.get(store.userStore.user.establishmentId!) as EstablishmentWithList;
+            const estimate = {
+                totalSum: cart.sum,
+                establishmentId: establishment.id,                                                                                                                                                      
+                products: [] as EstimateProductCreate[],
+                services: [] as EstimateServiceCreate[]
+            };
+            let alertMessage = "";                                                                                                                                          
+            if(cart.cartProducts.length > 0) {
+                cart.cartProducts.forEach(cp => {
+                    estimate.products.push({
+                        price: cp.price / cp.amount,
+                        amount: cp.amount,
+                        totalSum: cp.price,
+                        productId: cp.productId
+                    });
+                });
+            }
+
+            if(cart.cartServices.length > 0) {
+                cart.cartServices.forEach(cs => {
+                    estimate.services.push({
+                        price: cs.price/cs.amount!,
+                        amount: cs.amount!,
+                        totalSum: cs.price,
+                        serviceId: cs.serviceId
+                    });
+                })
+            }
+            alertMessage += `${cart.sum}`
+            const cashRegisterProducts = this.cashRegisterProducts;
+            agent.EstimateRequests.createEstimate(estimate)
+                .then(response => {
+                    Swal.fire({
+                        title: 'Смета успешно создана',
+                        icon:"success"
+                    });
+                });
+            cart.cartProducts.forEach(p => {
+                cashRegisterProducts.find(rp => rp.productId == p.productId)!.amount -= p.amount; 
+            })
+            runInAction(() => {
+                this.cashRegisterProducts = cashRegisterProducts;
+                this.cart = {cartProducts: [] as EstablishmentProduct[], cartServices: [] as EstablishmentService[], sum: 0};
+            });
+            this.setLoading(false);
+        } catch (error) {
+            console.log(error);
+        }
+        this.setLoading(false);
+    } 
 
     getEstablishment = async () => {
         try {
             if(store.userStore.user === null) 
                 return;
             const establishment = await agent.EstablishmentRequests.get(store.userStore.user.establishmentId!) as EstablishmentWithList;
+            if(establishment.products.length === 0) {
+                this.productsTabSelected = false;
+            }
             runInAction(() => {
                 this.cashRegisterProducts = establishment.products;
                 this.cashRegisterServices = establishment.services;
@@ -45,6 +122,7 @@ export default class CashRegisterStore {
             let newCartItem = {
                 productId: productFromCashRegister.productId,
                 productName: productFromCashRegister.productName,
+                productBarCode: productFromCashRegister.productBarCode,
                 price: productFromCashRegister.price,
                 amount: 1,
                 metric: productFromCashRegister.metric

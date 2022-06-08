@@ -6,3 +6,4 @@ export interface Cart {
     cartServices: EstablishmentService[];
     sum: number;
 }
+

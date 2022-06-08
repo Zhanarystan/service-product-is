@@ -7,7 +7,7 @@ import CartItem from "./CartProduct";
 import CartService from "./CartService";
 
 export default observer(function Cart() {
-    const {cashRegisterStore: {cart}} = useStore();
+    const {cashRegisterStore: {cart, sendEstimate}} = useStore();
     return (
         <>
             {cart.cartProducts.length !== 0 ?<div className="card">
@@ -36,6 +36,9 @@ export default observer(function Cart() {
                     </div>
                 </div>
             </div>
+            {cart.cartProducts.length !== 0 || cart.cartServices.length !== 0 ?
+        <button className="ui button green mt-3" onClick={sendEstimate}>Отправить</button>
+            : ""}
         </>
     )
 });

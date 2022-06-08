@@ -21,7 +21,7 @@ export default class UserStore {
             store.commonStore.setToken(user.token);
             runInAction(() => this.user = user);
             if(user.roles.includes('system_admin'))
-                history.push('/admin');
+                history.push('/admin/establishments');
             else
                 history.push('/enterprise/cash-register');
         }catch(error){

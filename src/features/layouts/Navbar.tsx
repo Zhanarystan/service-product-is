@@ -7,7 +7,9 @@ import Loading from "../common/Loading";
 
 let routes = [
     "/enterprise/cash-register",
-    "/enterprise/employees",
+    "/enterprise/admin/employees",
+    "/enterprise/admin/products",
+    "/enterprise/admin/establishment",
     "/profile"
 ]
 export default observer(function Navbar() {
@@ -23,9 +25,17 @@ export default observer(function Navbar() {
                     </Link>
                 : ""}
                 {user.roles.includes("establishment_admin") ? 
-                    <Link className={location.pathname === routes[1] ? "item active" : "item"} to={routes[1]}>
-                        Сотрудники
-                    </Link>
+                    <>
+                        <Link className={location.pathname === routes[1] ? "item active" : "item"} to={routes[1]}>
+                            Сотрудники
+                        </Link>
+                        <Link className={location.pathname === routes[2] ? "item active" : "item"} to={routes[2]}>
+                            Продукты
+                        </Link>
+                        <Link className={location.pathname === routes[3] ? "item active" : "item"} to={routes[3]}>
+                            Заведение
+                        </Link>
+                    </>
                 : ""}
                 <div className="right menu">
                     <Link className={location.pathname === routes[2] ? "item active" : "item"} to={routes[2]}>

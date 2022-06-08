@@ -1,5 +1,6 @@
 import { observer } from "mobx-react-lite";
 import React, { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useStore } from "../../../app/stores/store";
 import Loading from "../../common/Loading";
 
@@ -17,6 +18,9 @@ export default observer(function EmployeesPage() {
             <div className="row">
                 <div className="col-1"></div>
                 <div className="col-10">
+                    <Link to="/enterprise/admin/employees/create">
+                        <button className="ui button">Создать пользователя</button>
+                    </Link>
                     <h2>Сотрудники</h2>
                     <table className="ui striped table">
                         <thead>

@@ -7,6 +7,7 @@ import { BrowserRouter, Router } from 'react-router-dom';
 import 'react-toastify/dist/ReactToastify.min.css';
 import 'react-toastify/dist/react-toastify';
 import {createBrowserHistory} from 'history'; 
+import './index.css';
 
 export const history = createBrowserHistory();
 const root = ReactDOM.createRoot(

@@ -22,6 +22,7 @@ export interface EstablishmentCreateValues {
 }
 
 export interface EstablishmentWithList {
+    id: number;
     name: string;
     bankCardNumber: string;
     latitude: number;
@@ -31,6 +32,7 @@ export interface EstablishmentWithList {
     isOpen: boolean;
     address: string;
     city: number;
+    photoUrl: string | null;
     products: EstablishmentProduct[];
     services: EstablishmentService[];
 }

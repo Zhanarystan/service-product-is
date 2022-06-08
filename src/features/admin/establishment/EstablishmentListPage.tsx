@@ -2,6 +2,7 @@ import { observer } from "mobx-react-lite";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useStore } from "../../../app/stores/store";
+import Loading from "../../common/Loading";
 
 export default observer(function EstablishmentListPage() {
 
@@ -22,6 +23,7 @@ export default observer(function EstablishmentListPage() {
                     </div>
                 </button>
             </Link>
+            {establishmentStore.loadingInitial ? <Loading/> : ""}
             <table className="ui celled table">
                 <thead>
                     <tr>
@@ -35,7 +37,8 @@ export default observer(function EstablishmentListPage() {
                 </thead>
                 <tbody>
                     {
-                        establishmentStore.establishmentList.map(establishment => (
+                        establishmentStore.establishmentList.slice(establishmentStore.currentPage * 10 - 10, establishmentStore.currentPage * 10)
+                            .map(establishment => (
                             <tr>
                                 <td>{establishment.name}</td>
                                 <td>{establishment.startWorkingTime}</td>
@@ -57,6 +60,17 @@ export default observer(function EstablishmentListPage() {
                     }
                 </tbody>
             </table>
+            <button className="ui left labeled icon button" onClick={() => establishmentStore.setCurrentPage(establishmentStore.currentPage - 1)}>
+                <i className="left arrow icon"></i>
+                Предыдущая
+            </button>
+            <div className="ui input labeled icon" style={{width: "100px"}}>
+                <input type="number" value={establishmentStore.currentPage} onChange={(e) => establishmentStore.setCurrentPage(+e.target.value)}/>
+            </div>
+            <button className="ui right labeled icon button" onClick={() => establishmentStore.setCurrentPage(establishmentStore.currentPage + 1)}>
+                <i className="right arrow icon"></i>
+                Следующая
+            </button>
         </>
     );
 });

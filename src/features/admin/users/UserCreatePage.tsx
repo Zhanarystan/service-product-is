@@ -1,15 +1,10 @@
-import { observer } from "mobx-react-lite";
-import React, { FormEvent, useEffect, useState } from "react";
-import { UserAtEstablishmentCreate } from "../../../app/models/user";
-import { useStore } from "../../../app/stores/store";
+import { observer } from 'mobx-react-lite';
+import React, { FormEvent, useEffect, useState } from 'react';
+import { UserAtEstablishmentCreate } from '../../../app/models/user';
+import { useStore } from '../../../app/stores/store';
 
-interface Props {
-    userId: number;
-}
-
-export default observer(function EmployeeCreateEditPage({userId}: Props) {
-    
-    const {enterpriseAdminStore, userStore} = useStore();
+export default observer(function CreateUserPage() {
+    const {adminStore, userStore, establishmentStore} = useStore();
     const [email, setEmail] = useState<string>("");
     const [username, setUsername] = useState<string>("");
     const [password, setPassword] = useState<string>("");
@@ -19,15 +14,17 @@ export default observer(function EmployeeCreateEditPage({userId}: Props) {
     const [day, setDay] = useState<number>(0);
     const [month, setMonth] = useState<number>(0);
     const [year, setYear] = useState<number>(0);
+    const [establishmentName, setEstablishmentName] = useState<string>("");
+
 
     useEffect(() => {
-
-    });
+        establishmentStore.getEstablishmentList();
+    }, [])
 
     const submit = (e: FormEvent) => {
         e.preventDefault();
         if(userStore.user !== null) {
-            const currentUser = userStore.user;
+            let establishmentId = establishmentStore.establishmentList.find(e => e.name == establishmentName)!.id;
             const newUser: UserAtEstablishmentCreate = {
                 username,
                 password,
@@ -38,12 +35,13 @@ export default observer(function EmployeeCreateEditPage({userId}: Props) {
                 month,
                 year,
                 iin,
-                establishmentId: currentUser.establishmentId!,
+                establishmentId: establishmentId!,
                 roles: [
-                    "establishment_seller"
+                    "establishment_seller",
+                    "establishment_admin"
                 ]
             };
-            enterpriseAdminStore.craeteUser(newUser);
+            adminStore.createUser(newUser);
         }
     }
     return (
@@ -51,7 +49,7 @@ export default observer(function EmployeeCreateEditPage({userId}: Props) {
             <div className="col-1"></div>
             <div className="col-10">
                 <form className="ui form" onSubmit={submit}>
-                    <h4 className="ui dividing header">Данные о новом пользователя</h4>
+                    <h4 className="ui dividing header">Данные о новом пользователе</h4>
                     <div className="two fields">
                         <div className="field">
                             <label>Имя</label>
@@ -119,18 +117,34 @@ export default observer(function EmployeeCreateEditPage({userId}: Props) {
                         </div>
                     </div>
                     <div className="two fields">
-                        {enterpriseAdminStore.errorMessages.length !== 0 ? 
+                        <div className="field">
+                            <label>Заведение</label>
+                            <input 
+                                type="text"
+                                placeholder="Заведение"
+                                list="establishment_list"
+                                onChange={(e) => setEstablishmentName(e.target.value)}
+                             />
+                             <datalist id="establishment_list">
+                                {establishmentStore.establishmentList.map((es) => {
+                                    return <option value={es.name}/>
+                                })}
+                             </datalist>
+                        </div>
+                    </div>
+                    <div className="two fields">
+                        {adminStore.errorMessages.length !== 0 ? 
                             <div className="alert alert-danger p-5" role="alert">
                                 <p>Данные не валидны: </p>
                                 <ul>
-                                    {enterpriseAdminStore.errorMessages.map(err => (
+                                    {adminStore.errorMessages.map(err => (
                                         <li>{err}</li>
                                     ))}
                                 </ul>
                             </div>
                             : ""}
                     </div>
-                    <button className="ui button" type="submit">Создать пользователя</button>
+                    <button className="ui button teal" type="submit">Создать пользователя</button>
                 </form>
             </div>
             <div className="col-1"></div>

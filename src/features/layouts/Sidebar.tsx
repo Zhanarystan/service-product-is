@@ -9,14 +9,18 @@ export default observer(function Sidebar() {
             <div className="ui vertical inverted sidebar menu left overlay visible" id="toc">
                 <div className="item">
                     <Link to={`/admin/manufacturers`}>
-                        <div className="header">Марки</div>
+                        <div className="header">Производители</div>
                     </Link>
                 </div>
                 <div className="item">
-                    <div className="header">Продукты</div>
+                    <Link to={`/admin/products`}>
+                        <div className="header">Продукты</div>
+                    </Link>
                 </div>
                 <div className="item">
-                    <div className="header">Сервисы</div>
+                    <Link to={`/admin/services`}>
+                        <div className="header">Сервисы</div>
+                    </Link>
                 </div>
                 <div className="item">
                     <Link to={`/admin/establishments`}>
@@ -25,7 +29,9 @@ export default observer(function Sidebar() {
                 </div>
                 <a href="#">
                 <div className="item">
-                    <div className="header">Пользователи</div>
+                    <Link to={`/admin/users`}>
+                        <div className="header">Пользователи</div>
+                    </Link>
                 </div>
                 </a>          
             </div>

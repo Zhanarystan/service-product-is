@@ -14,9 +14,22 @@ import CashRegister from './features/enterprise/cashRegister/CashRegister';
 import NotFound from './features/errors/NotFound';
 import Loading from './features/common/Loading';
 import EmployeesPage from './features/enterprise/employees/EmployeesPage';
-import EmployeeCreateEditPage from './features/enterprise/employees/EmployeeCreateEditPage';
 import { ToastContainer } from 'react-toastify';
-
+import ProductsPage from './features/enterprise/products/ProductsPage';
+import EstablishmentPage from './features/enterprise/establishment/EstablishmentPage';
+import UserListPage from './features/admin/users/UserListPage';
+import EmployeeCreatePage from './features/enterprise/employees/EmployeeCreatePage';
+import UserCreatePage from './features/admin/users/UserCreatePage';
+import UserEditPage from './features/admin/users/UserEditPage';
+import ProductListPage from './features/admin/product/ProductListPage';
+import ProductCreatePage from './features/admin/product/ProductCreatePage';
+import ProductEditPage from './features/admin/product/ProductEditPage';
+import ServiceListPage from './features/admin/service/ServiceListPage';
+import ServiceCreatePage from './features/admin/service/ServiceCreatePage';
+import ServiceEditPage from './features/admin/service/ServiceEditPage';
+import ManufacturerCreatePage from './features/admin/manufacturer/ManufacturerCreatePage';
+import ManufacturerEditPage from './features/admin/manufacturer/ManufacturerEditPage';
+import ProductListToAddPage from './features/enterprise/productsToAdd/ProductListToAddPage';
 
 function App() {
   const {userStore: {getUser ,user}, commonStore} = useStore();
@@ -24,7 +37,6 @@ function App() {
   useEffect(() => {
     if(commonStore.token){
       getUser().finally(() => commonStore.setAppLoaded());
-      console.log(commonStore.token);
     }else{
       commonStore.setAppLoaded();
       history.push('/login');
@@ -55,34 +67,28 @@ function App() {
           render={() => {
             if(!user)
               return <Loading/>
+            if(!user.roles.includes("establishment_seller") && !user.roles.includes("establishment_seller")) 
+              return <Redirect to={{pathname:'/error/not-found'}} />
             return (
               <>
                 <Navbar/>
-                <Route exact path='/enterprise/cash-register' render={() => {
-                    if(!user.roles.includes("establishment_seller")) 
-                      return <Redirect to={{pathname:'/error/not-found'}} />
-                    return (
-                      <CashRegister />
-                    )
-                  }} /> 
-                <Route exact path='/enterprise/employees'
+                <Route 
+                  path={'/enterprise/admin(.+)'}
                   render={() => {
                     if(!user.roles.includes("establishment_admin")) 
                       return <Redirect to={{pathname:'/error/not-found'}} />
                     return (
-                      <EmployeesPage/>
+                      <>
+                        <Route exact path='/enterprise/admin/establishment' component={EstablishmentPage} />
+                        <Route exact path='/enterprise/admin/employees' component={EmployeesPage} />
+                        <Route exact path='/enterprise/admin/employees/create' component={EmployeeCreatePage}/>
+                        <Route exact path='/enterprise/admin/products' component={ProductsPage}/>
+                        <Route exact path='/enterprise/admin/products-to-add' component={ProductListToAddPage}/>
+                      </>
                     )
                   }}
-                /> 
-                <Route exact path='/enterprise/employees/create'
-                  render={() => {
-                    if(!user.roles.includes("establishment_admin")) 
-                      return <Redirect to={{pathname:'/error/not-found'}} />
-                    return (
-                      <EmployeeCreateEditPage userId={0}/>
-                    )
-                  }}
-                /> 
+                  />
+                <Route exact path='/enterprise/cash-register' component={CashRegister} /> 
               </>
             )
           }}
@@ -99,18 +105,39 @@ function App() {
                     <div className='col-2'>
                       <Sidebar />
                     </div>
-                    <div className='col-9'>
+                    <div className='col-9 mb-5'>
                       <Navbar/>   
                       <Route exact path='/admin/establishments' component={EstablishmentListPage} />
                       <Route exact path='/admin/establishments/:id' component={EstablishmentEditPage} />
                       <Route exact path='/admin/establishments-create' component={EstablishmentCreatePage} />
+                      <Route exact path='/admin/manufacturers/:manufacturerId' component={ManufacturerEditPage} />
                       <Route exact path='/admin/manufacturers' component={ManufacturerListPage} />
+                      <Route exact path='/admin/manufacturer-create' component={ManufacturerCreatePage} />
+                      <Route exact path='/admin/users/:id' component={UserEditPage} />
+                      <Route exact path='/admin/users' component={UserListPage} />
+                      <Route exact path='/admin/user-create' component={UserCreatePage} />
+                      <Route exact path='/admin/products/:productId' component={ProductEditPage} />
+                      <Route exact path='/admin/products' component={ProductListPage} />
+                      <Route exact path='/admin/product-create' component={ProductCreatePage} />
+                      <Route exact path='/admin/services/:serviceId' component={ServiceEditPage} />
+                      <Route exact path='/admin/services' component={ServiceListPage} />
+                      <Route exact path='/admin/service-create' component={ServiceCreatePage} />
                     </div>  
                   </div>
                 }
               </>
             )
           }}/>
+        <Route 
+          exact 
+          path={'/'}
+          render={() => {
+            if(user && user.roles.includes("establishment_seller"))
+              return <Redirect to={{pathname: '/enterprise/cash-register'}}/>
+            else if(user && user.roles.includes("system_admin")) 
+              return <Redirect to={{pathname: '/admin/establishments'}} />
+          }}
+        />
       </Switch>
       <ToastContainer position="bottom-right"/>
     </>

@@ -1,22 +1,24 @@
 import { observer } from "mobx-react-lite";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { useStore } from "../../../app/stores/store";
 import Loading from "../../common/Loading";
 
-export default observer(function ManufacturerListPage() {
+export default observer(function ProductListPage() {
 
-    const {adminStore: {getManufacturers, currentPage, setCurrentPage, maxPage, manufacturers, loading}} = useStore();
+    const {adminStore: {getProducts, currentPage, setCurrentPage, maxPage, products, uploadProductsCSV, loading}} = useStore();
+    const [uploadSegmentOpened, setUploadSegmentOpened] = useState<boolean>(false);
     const [searchingString, setSearchString] = useState<string>("");
+
     useEffect(() => {
-        getManufacturers();
+        getProducts();
         setCurrentPage(1);
     }, [])
 
     return (
         <>
-            <h1>Производители</h1>
-            <Link to={`/admin/manufacturer-create`}>
+            <h1>Продукты</h1>
+            <Link to={`/admin/product-create`}>
                 <button className="medium green ui button">
                     <div className="d-flex">
                         <i className="plus icon"></i>
@@ -24,8 +26,30 @@ export default observer(function ManufacturerListPage() {
                     </div>
                 </button>
             </Link>
+            <button className="ui left labeled teal icon button" onClick={() => setUploadSegmentOpened(!uploadSegmentOpened)}>
+                <i className="cloud upload icon"></i>
+                Загрузить с CSV файла
+            </button>
+            {uploadSegmentOpened ? 
+                <div className="ui placeholder segment">
+                    <div className="ui icon header">
+                        <i className="csv file outline icon"></i>
+                        Загрузите документ
+                    </div>
+                    <input type="file" id="filePicker" style={{visibility:"hidden"}} 
+                        onChange={(e) => {
+                                console.log("eeeee");
+                                if(!e.target.files) return;   
+                                uploadProductsCSV(e.target.files[0]);
+                            }
+                        } />
+                    <label htmlFor="filePicker" className={loading ? `ui loading primary button` : 'ui primary button'}>
+                        Выбрать файл
+                    </label>
+                </div> : ""
+            }
             <div className="ui fluid icon input" style={{marginTop: "10px"}}>
-                <input type="text" placeholder="Имя производителя..." onChange={(e) => setSearchString(e.target.value)} />
+                <input type="text" placeholder="Имя продукта..." onChange={(e) => setSearchString(e.target.value)} />
                 <i className="search icon"></i>
             </div>
             {loading ? <Loading/> : ""}
@@ -33,17 +57,21 @@ export default observer(function ManufacturerListPage() {
                 <thead>
                     <tr>
                         <th>Наименование</th>
-                        <th>Описание</th>
+                        <th>Штрих код</th>
+                        <th>Производитель</th>
                         <th>Действие</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {manufacturers.slice(currentPage * 10 - 10, currentPage * 10).map(m => (
+                    {products.filter(p => p.name.toLowerCase().startsWith(searchingString.toLowerCase()))
+                        .slice(currentPage * 10 - 10, currentPage * 10)
+                        .map(p => (
                         <tr>
-                            <td>{m.name}</td>
-                            <td>{m.description}</td>
+                            <td>{p.name}</td>
+                            <td>{p.barCode}</td>
+                            <td>{p.manufacturer}</td>
                             <td>
-                                <Link to={`/admin/manufacturers/${m.id}`}>
+                                <Link to={`/admin/products/${p.id}`}>
                                     <button className="ui icon button">
                                         <div className="d-flex">
                                             <i className="pencil alternate icon"></i>

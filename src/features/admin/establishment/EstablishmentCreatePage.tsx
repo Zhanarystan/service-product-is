@@ -94,7 +94,7 @@ export default observer(function EstablishmentCreatePage() {
                         </div>
                     </div>
                 </div>
-                <button className="ui button" type="submit">Submit Order</button>
+                <button className="ui button green" type="submit">Отправить</button>
             </form>
         </>
     );

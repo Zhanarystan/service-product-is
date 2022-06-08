@@ -10,13 +10,7 @@ export default observer(function CartProduct({product} : Props) {
     const {cashRegisterStore: {addProductToCart, setProductAmount, removeFromProductCart}} = useStore();
     return (
         <div className="row mb-4">
-            <div className="col-2">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Google_Photos_icon_%282020%29.svg/800px-Google_Photos_icon_%282020%29.svg.png" 
-                    alt="img" 
-                    style={{width: "50px", height: "50px"}}
-                />
-            </div>
-            <div className="col-3">
+            <div className="col-5">
                 <p>{product.productName}</p>
             </div>
             <div className="col-4">
